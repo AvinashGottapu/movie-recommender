@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Recommender</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #0A0F1F;
+            font-family: 'Segoe UI', sans-serif;
+            color: #E5ECFF;
+            text-align: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 720px;
+            margin: 70px auto;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 45px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, #2D9CFF, #00E5FF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: slideDown 0.7s ease forwards;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .search-box {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            animation: fadeIn 1s ease forwards;
+        }
+
+        input {
+            width: 70%;
+            padding: 14px;
+            border-radius: 15px;
+            border: 2px solid #1F3B73;
+            background: #0F162A;
+            color: #BBD4FF;
+            font-size: 18px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: #2D9CFF;
+            box-shadow: 0 0 10px #1D77FF;
+        }
+
+        button {
+            padding: 14px 24px;
+            font-size: 18px;
+            border-radius: 15px;
+            border: none;
+            cursor: pointer;
+            background: linear-gradient(45deg, #1D77FF, #00C3FF);
+            color: white;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            transform: scale(1.06);
+            box-shadow: 0 0 15px #008CFF;
+        }
+
+        .results {
+            margin-top: 40px;
+            animation: fadeIn 1.5s ease forwards;
+        }
+
+        .movie-card {
+            background: rgba(15, 22, 42, 0.9);
+            border: 1px solid #1D77FF;
+            border-radius: 15px;
+            padding: 18px;
+            margin: 12px 0;
+            font-size: 20px;
+            color: #D8E6FF;
+            box-shadow: 0 0 12px #0D2F6B55;
+            opacity: 0;
+            transform: translateY(15px);
+            animation: cardIn 0.4s forwards;
+        }
+
+        @keyframes cardIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>🔵 Movie Recommender</h1>
+
+        <div class="search-box">
+            <input type="text" id="movieInput" placeholder="Enter a movie name...">
+            <button onclick="recommend()">Recommend</button>
+        </div>
+
+        <div id="results" class="results"></div>
+    </div>
+
+    <script>
+        async function recommend() {
+            const movie = document.getElementById("movieInput").value;
+            const resultsDiv = document.getElementById("results");
+            resultsDiv.innerHTML = "";
+
+            if (!movie) {
+                resultsDiv.innerHTML = "<div class='movie-card'>⚠️ Please enter a movie name.</div>";
+                return;
+            }
+
+            resultsDiv.innerHTML = "<div class='movie-card'>⏳ Fetching recommendations...</div>";
+
+            try {
+                const response = await fetch("/api/recommend?movie=" + encodeURIComponent(movie));
+                const data = await response.json();
+
+                if (!data.recommendations) {
+                    resultsDiv.innerHTML = "<div class='movie-card'>❌ Movie not found.</div>";
+                    return;
+                }
+
+                resultsDiv.innerHTML = "";
+                data.recommendations.forEach((m, i) => {
+                    resultsDiv.innerHTML += `
+                        <div class="movie-card">
+                            <strong>#${i + 1}</strong><br>
+                            🎬 <span style="color:#4AB3FF;">${m}</span>
+                        </div>
+                    `;
+                });
+
+            } catch (err) {
+                resultsDiv.innerHTML = "<div class='movie-card'>🚫 Error connecting to server.</div>";
+            }
+        }
+    </script>
+
+</body>
+</html>
