@@ -13,10 +13,12 @@ app = FastAPI()
 #  DATA LOADING & PREPROCESSING
 # -----------------------------
 
+
+
 CSV_PATH = os.path.join("public")
 
-movies = pd.read_csv("../public/tmdb_500_movies_subset.csv")
-credits = pd.read_csv("../public/tmdb_500_credits_subset.csv")
+movies = pd.read_csv(f"{CSV_PATH}/tmdb_500_movies_subset.csv")
+credits = pd.read_csv(f"{CSV_PATH}/tmdb_500_credits_subset.csv")
 
 movies = movies.merge(credits, on="title")
 
